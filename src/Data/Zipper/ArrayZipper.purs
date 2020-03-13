@@ -130,7 +130,8 @@ toArrayZipperAt' focusIndex = case _ of
         then Just (ArrayZipper { array, focusIndex, maxIndex })
         else Nothing
 
--- | Exposes the underlying array
+-- | Exposes the underlying array. **Note:** any mutations to this array via
+-- | `unsafeThaw` will invalidate the constraints guaranteed by `ArrayZipper`.
 exposeArray :: forall a. ArrayZipper a -> Array a
 exposeArray (ArrayZipper r) = r.array
 
