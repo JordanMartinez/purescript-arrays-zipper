@@ -7,6 +7,8 @@ module Data.Zipper.ArrayZipper
   , toArrayZipperAt'
 
   , exposeArray
+  , exposeMaxIndex
+  , exposeFocusIndex
 
   , hasPrev
   , hasNext
@@ -131,6 +133,14 @@ toArrayZipperAt' focusIndex = case _ of
 -- | Exposes the underlying array
 exposeArray :: forall a. ArrayZipper a -> Array a
 exposeArray (ArrayZipper r) = r.array
+
+-- | Exposes the index of the last element
+exposeMaxIndex :: forall a. ArrayZipper a -> Int
+exposeMaxIndex (ArrayZipper r) = r.maxIndex
+
+-- | Exposes the index of the focused element
+exposeFocusIndex :: forall a. ArrayZipper a -> Int
+exposeFocusIndex (ArrayZipper r) = r.focusIndex
 
 -- | Returns `true` if `prev` will return a `Just`
 hasPrev :: forall a. ArrayZipper a -> Boolean
