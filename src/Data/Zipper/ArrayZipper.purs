@@ -47,7 +47,12 @@ import Partial.Unsafe (unsafePartial)
 -- | array, but each modification will create a new array that includes the change.
 newtype ArrayZipper a = ArrayZipper { array :: Array a, focusIndex :: Int, maxIndex :: Int }
 
+derive instance eqArrayZipper :: Eq a => Eq (ArrayZipper a)
+derive instance ordArrayZipper :: Ord a => Ord (ArrayZipper a)
 derive instance functorArrayZipper :: Functor ArrayZipper
+
+instance showArrayZipper :: Show a => Show (ArrayZipper a) where
+  show (ArrayZipper r) = "ArrayZipper(" <> show r <> ")"
 
 instance functorWithIndex :: FunctorWithIndex Int ArrayZipper where
   mapWithIndex f (ArrayZipper r) = ArrayZipper r { array = mapWithIndex f r.array }
