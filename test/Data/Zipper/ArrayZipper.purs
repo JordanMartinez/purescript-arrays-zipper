@@ -13,7 +13,7 @@ spec = describe "Array Zipper" do
   describe "Construction" do
     it "valid constructions" do
       (asArrayZipper 1) `shouldEqual` (mkZipper 0 [1])
-      (getFocus <$> (toArrayZipperFirst [1])) `shouldEqual` (Just 1)
+      (getFocus <$> toArrayZipperFirst [1]) `shouldEqual` (Just 1)
       (getFocus <$> toArrayZipperLast [0, 1]) `shouldEqual` (Just 1)
       (getFocus <$> toArrayZipperAt (-1) [0, 1, 2]) `shouldEqual` (Just 0)
       (getFocus <$> toArrayZipperAt   0  [0, 1, 2]) `shouldEqual` Just 0
@@ -21,15 +21,15 @@ spec = describe "Array Zipper" do
       (getFocus <$> toArrayZipperAt   2  [0, 1, 2]) `shouldEqual` Just 2
       (getFocus <$> toArrayZipperAt   3  [0, 1, 2]) `shouldEqual` Just 2
 
-      (getFocus <$> toArrayZipperAt'   0  [0, 1, 2]) `shouldEqual` Just 0
-      (getFocus <$> toArrayZipperAt'   1  [0, 1, 2]) `shouldEqual` Just 1
-      (getFocus <$> toArrayZipperAt'   2  [0, 1, 2]) `shouldEqual` Just 2
+      (getFocus <$> toArrayZipperAt'  0  [0, 1, 2]) `shouldEqual` Just 0
+      (getFocus <$> toArrayZipperAt'  1  [0, 1, 2]) `shouldEqual` Just 1
+      (getFocus <$> toArrayZipperAt'  2  [0, 1, 2]) `shouldEqual` Just 2
 
     it "invalid constructions" do
       toArrayZipperFirst emptyArray `shouldEqual` Nothing
       toArrayZipperLast emptyArray `shouldEqual` Nothing
       toArrayZipperAt' (-1) [0, 1, 2] `shouldEqual` Nothing
-      toArrayZipperAt'    3 [0, 1, 2] `shouldEqual` Nothing
+      toArrayZipperAt'   3  [0, 1, 2] `shouldEqual` Nothing
 
   describe "focus relocation" do
     it "prev" do
