@@ -1,0 +1,21 @@
+{
+    "name": "purescript-my-project",
+    "license": [
+        "MIT"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/JordanMartinez/purescript-arrays-zipper"
+    },
+    "ignore": [
+        "**/.*",
+        "node_modules",
+        "bower_components",
+        "output"
+    ],
+    "dependencies": {
+        "purescript-arrays": "^v5.3.1",
+        "purescript-psci-support": "^v4.0.0",
+        "purescript-spec": "^v4.0.1"
+    }
+}
