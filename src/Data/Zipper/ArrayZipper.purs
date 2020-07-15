@@ -214,15 +214,15 @@ foreign import unsafeModifyAt :: forall a. Int -> (a -> a) -> Array a -> Array a
 getFocus :: forall a. ArrayZipper a -> a
 getFocus (ArrayZipper r) = unsafePartial (unsafeIndex r.array r.focusIndex)
 
--- | Sets the focus element.
+-- | Sets the focus element. `O(n)`
 setFocus :: forall a. a -> ArrayZipper a -> ArrayZipper a
 setFocus a (ArrayZipper r) = ArrayZipper (r { array = unsafeSetAt r.focusIndex a r.array })
 
--- | Uses a function to update the focus element.
+-- | Uses a function to update the focus element. `O(n)`
 modifyFocus :: forall a. (a -> a) -> ArrayZipper a -> ArrayZipper a
 modifyFocus f (ArrayZipper r) = ArrayZipper (r { array = unsafeModifyAt r.focusIndex f r.array })
 
--- | Inserts an element in front of / to the left of the focus element.
+-- | Inserts an element in front of / to the left of the focus element. `O(n)`
 pushPrev :: forall a. a -> ArrayZipper a -> ArrayZipper a
 pushPrev a (ArrayZipper r) =
   ArrayZipper { focusIndex: r.focusIndex + 1
@@ -230,7 +230,7 @@ pushPrev a (ArrayZipper r) =
               , array: unsafeInsertAt r.focusIndex a r.array
               }
 
--- | Inserts an element behind / to the right of the focus element.
+-- | Inserts an element behind / to the right of the focus element. `O(n)`
 pushNext :: forall a. a -> ArrayZipper a -> ArrayZipper a
 pushNext a (ArrayZipper r) =
   ArrayZipper r { maxIndex = r.maxIndex + 1
@@ -238,7 +238,7 @@ pushNext a (ArrayZipper r) =
                 }
 
 -- | Inserts an element in front of / to the left of the focus element
--- | and sets this new element as the focus element.
+-- | and sets this new element as the focus element. `O(n)`
 pushPrevRefocus :: forall a. a -> ArrayZipper a -> ArrayZipper a
 pushPrevRefocus a (ArrayZipper r) =
     ArrayZipper r { maxIndex = r.maxIndex + 1
@@ -246,7 +246,7 @@ pushPrevRefocus a (ArrayZipper r) =
                   }
 
 -- | Inserts an element behind / to the right of the focus element
--- | and sets this new element as the focus element.
+-- | and sets this new element as the focus element. `O(n)`
 pushNextRefocus :: forall a. a -> ArrayZipper a -> ArrayZipper a
 pushNextRefocus a (ArrayZipper r) =
     ArrayZipper r { focusIndex = r.focusIndex + 1
