@@ -6,4 +6,5 @@ You can edit this file as you like.
 , dependencies = [ "arrays", "psci-support", "spec" ]
 , packages = ./packages.dhall
 , sources = [ "src/**/*.purs", "test/**/*.purs" ]
+, license = "MIT"
 }
