@@ -43,8 +43,10 @@ import Data.Traversable (class Traversable, sequenceDefault, traverse)
 import Data.TraversableWithIndex (class TraversableWithIndex, traverseWithIndex)
 import Partial.Unsafe (unsafePartial)
 
--- | An immutable Zipper for an Array. Modifications do not mutate that underlying
--- | array, but each modification will create a new array that includes the change.
+-- | An immutable Zipper for an Array. Modifications are `O(n)` due to creating
+-- | a new array rather than mutating the underlying array. Navigating to a
+-- | new focus element is `O(1)` regardless of how far away from the current
+-- | focus that element is.
 newtype ArrayZipper a = ArrayZipper { array :: Array a, focusIndex :: Int, maxIndex :: Int }
 
 derive instance eqArrayZipper :: Eq a => Eq (ArrayZipper a)
