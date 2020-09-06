@@ -38,7 +38,9 @@ module Data.Zipper.ArrayZipper
 
 import Prelude
 
-import Data.Array (findIndex, length, mapWithIndex, unsafeIndex)
+import Control.Comonad (class Comonad)
+import Control.Extend (class Extend)
+import Data.Array (findIndex, length, mapWithIndex, slice, unsafeIndex)
 import Data.Foldable (class Foldable, foldMapDefaultL, foldl, foldr)
 import Data.FoldableWithIndex (class FoldableWithIndex, foldMapWithIndex, foldlWithIndex, foldrWithIndex)
 import Data.FunctorWithIndex (class FunctorWithIndex)
@@ -88,6 +90,22 @@ instance traversableWithIndex :: TraversableWithIndex Int ArrayZipper where
   traverseWithIndex f (ArrayZipper r) = ado
     ar <- traverseWithIndex f r.array
     in (ArrayZipper r { array = ar })
+
+instance extendArrayZipper :: Extend ArrayZipper where
+  extend :: forall b a. (ArrayZipper a -> b) -> ArrayZipper a -> ArrayZipper b
+  extend f (ArrayZipper recA) =
+    let
+      sliceZipper idx _ =
+        f (ArrayZipper
+            { array: slice idx (recA.maxIndex + 1) recA.array
+            , focusIndex: 0
+            , maxIndex: recA.maxIndex - idx
+            })
+    in ArrayZipper (recA { focusIndex = 0, array = mapWithIndex sliceZipper recA.array})
+
+instance comonadArrayZipper :: Comonad ArrayZipper where
+  extract :: forall a. ArrayZipper a -> a
+  extract = getFocus
 
 -- | Creates an Array Zipper from a single element. This will be stored
 -- | internally as a 1-element array. To further build upon this array,
