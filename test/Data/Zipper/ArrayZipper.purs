@@ -3,7 +3,7 @@ module Test.Data.Zipper.ArrayZipper where
 import Prelude
 
 import Data.Maybe (Maybe(..), fromJust)
-import Data.Zipper.ArrayZipper (ArrayZipper, asArrayZipper, getFocus, modifyFocus, next, prev, pushNextRefocus, pushPrevRefocus, setFocus, shiftFocusBy, shiftFocusBy', shiftFocusFirst, shiftFocusLast, toArrayZipperAt, toArrayZipperAt', toArrayZipperFirst, toArrayZipperLast)
+import Data.Zipper.ArrayZipper (ArrayZipper, asArrayZipper, getFocus, modifyFocus, next, prev, pushNextRefocus, pushPrevRefocus, setFocus, shiftFocusBy, shiftFocusBy', shiftFocusByFind, shiftFocusByFind', shiftFocusTo, shiftFocusTo', shiftFocusFirst, shiftFocusLast, toArrayZipperAt, toArrayZipperAt', toArrayZipperFirst, toArrayZipperLast)
 import Partial.Unsafe (unsafePartial)
 import Test.Spec (Spec, describe, it)
 import Test.Spec.Assertions (shouldEqual)
@@ -56,6 +56,62 @@ spec = describe "Array Zipper" do
       shiftFocusBy' (_ + 1) i0 `shouldEqual` Just (mkZipper 1 a4)
       shiftFocusBy' (_ + 1) i2 `shouldEqual` Just (mkZipper 3 a4)
       shiftFocusBy' (_ + 1) i4 `shouldEqual` Nothing
+    it "shift focus by find" do
+      let da = [0, 1, 1, 2]
+      let da0 = mkZipper 0 da
+      let da1 = mkZipper 1 da
+      let da2 = mkZipper 2 da
+      shiftFocusByFind ((==) 0) i0 `shouldEqual` i0
+      shiftFocusByFind ((==) 0) i2 `shouldEqual` i0
+      shiftFocusByFind (_ > 1) i0 `shouldEqual` i2
+      shiftFocusByFind (_ > 1) i2 `shouldEqual` i2
+      shiftFocusByFind (_ > 1) i4 `shouldEqual` i2
+      shiftFocusByFind (_ > 10) i0 `shouldEqual` i0
+      shiftFocusByFind (_ > 10) i2 `shouldEqual` i2
+      shiftFocusByFind ((==) 1) da0 `shouldEqual` da1
+      shiftFocusByFind (_ > 0) da0 `shouldEqual` da1
+      shiftFocusByFind ((==) 1) da1 `shouldEqual` da1
+      shiftFocusByFind (_ > 0) da1 `shouldEqual` da1
+      shiftFocusByFind ((==) 1) da2 `shouldEqual` da1
+      shiftFocusByFind (_ > 0) da2 `shouldEqual` da1
+      shiftFocusByFind (_ > 10) da1 `shouldEqual` da1
+      shiftFocusByFind (_ > 10) da2 `shouldEqual` da2
+    it "shift focus by find'" do
+      let da = [0, 1, 1, 2]
+      let da0 = mkZipper 0 da
+      let da1 = mkZipper 1 da
+      let da2 = mkZipper 2 da
+      shiftFocusByFind' ((==) 0) i0 `shouldEqual` Just i0
+      shiftFocusByFind' ((==) 0) i2 `shouldEqual` Just i0
+      shiftFocusByFind' (_ > 1) i0 `shouldEqual` Just i2
+      shiftFocusByFind' (_ > 1) i2 `shouldEqual` Just i2
+      shiftFocusByFind' (_ > 1) i4 `shouldEqual` Just i2
+      shiftFocusByFind' (_ > 10) i0 `shouldEqual` Nothing
+      shiftFocusByFind' (_ > 10) i2 `shouldEqual` Nothing
+      shiftFocusByFind' ((==) 1) da0 `shouldEqual` Just da1
+      shiftFocusByFind' (_ > 0) da0 `shouldEqual` Just da1
+      shiftFocusByFind' ((==) 1) da1 `shouldEqual` Just da1
+      shiftFocusByFind' (_ > 0) da1 `shouldEqual` Just da1
+      shiftFocusByFind' ((==) 1) da2 `shouldEqual` Just da1
+      shiftFocusByFind' (_ > 0) da2 `shouldEqual` Just da1
+      shiftFocusByFind' (_ > 10) da1 `shouldEqual` Nothing
+      shiftFocusByFind' (_ > 10) da2 `shouldEqual` Nothing
+    it "shift focus to" do
+      shiftFocusTo 0 i0 `shouldEqual` i0
+      shiftFocusTo 0 i2 `shouldEqual` i0
+      shiftFocusTo 0 i4 `shouldEqual` i0
+      shiftFocusTo 2 i0 `shouldEqual` i2
+      shiftFocusTo 4 i0 `shouldEqual` i4
+      shiftFocusTo 5 i2 `shouldEqual` i2
+      shiftFocusTo (-1) i2 `shouldEqual` i2
+    it "shift focus to'" do
+      shiftFocusTo' 0 i0 `shouldEqual` Just i0
+      shiftFocusTo' 0 i2 `shouldEqual` Just i0
+      shiftFocusTo' 0 i4 `shouldEqual` Just i0
+      shiftFocusTo' 2 i0 `shouldEqual` Just i2
+      shiftFocusTo' 4 i0 `shouldEqual` Just i4
+      shiftFocusTo' 5 i2 `shouldEqual` Nothing
+      shiftFocusTo' (-1) i2 `shouldEqual` Nothing
     it "shift focus first" do
       shiftFocusFirst i0 `shouldEqual` mkZipper 0 a4
       shiftFocusFirst i2 `shouldEqual` mkZipper 0 a4

@@ -18,6 +18,10 @@ module Data.Zipper.ArrayZipper
 
   , shiftFocusBy
   , shiftFocusBy'
+  , shiftFocusByFind
+  , shiftFocusByFind'
+  , shiftFocusTo
+  , shiftFocusTo'
   , shiftFocusFirst
   , shiftFocusLast
 
@@ -34,11 +38,11 @@ module Data.Zipper.ArrayZipper
 
 import Prelude
 
-import Data.Array (length, mapWithIndex, unsafeIndex)
+import Data.Array (findIndex, length, mapWithIndex, unsafeIndex)
 import Data.Foldable (class Foldable, foldMapDefaultL, foldl, foldr)
 import Data.FoldableWithIndex (class FoldableWithIndex, foldMapWithIndex, foldlWithIndex, foldrWithIndex)
 import Data.FunctorWithIndex (class FunctorWithIndex)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(..), fromMaybe)
 import Data.Traversable (class Traversable, sequenceDefault, traverse)
 import Data.TraversableWithIndex (class TraversableWithIndex, traverseWithIndex)
 import Partial.Unsafe (unsafePartial)
@@ -195,6 +199,30 @@ shiftFocusBy' f (ArrayZipper r) =
   in if 0 <= updatedFocusIndex && updatedFocusIndex <= r.maxIndex
       then Just (ArrayZipper r { focusIndex = updatedFocusIndex })
       else Nothing
+
+-- | Use a function to find and focus the first matching element in the array.
+-- | If no element matches, the zipper is returned unchanged.
+shiftFocusByFind :: forall a. (a -> Boolean) -> ArrayZipper a -> ArrayZipper a
+shiftFocusByFind f zipper = fromMaybe zipper $ shiftFocusByFind' f zipper
+
+-- | Use a function to find and the first matching element in the array.
+-- | If no element matches, `Nothing` is returned.
+-- | If an element matches, `Just zipper` is returned.
+shiftFocusByFind' :: forall a. (a -> Boolean) -> ArrayZipper a -> Maybe (ArrayZipper a)
+shiftFocusByFind' f zipper@(ArrayZipper r) = do
+  index <- findIndex f r.array
+  pure $ ArrayZipper $ r { focusIndex = index }
+
+-- | Find and focus the first equal element in the array.
+-- | If no element is equal, the zipper is returned unchanged.
+shiftFocusTo :: forall a. Eq a => a -> ArrayZipper a -> ArrayZipper a
+shiftFocusTo a zipper = shiftFocusByFind ((==) a) zipper
+
+-- | Find and focus the first equal element in the array.
+-- | If no element is equal, `Nothing` is returned.
+-- | If an element is equal, `Just zipper` is returned.
+shiftFocusTo' :: forall a. Eq a => a -> ArrayZipper a -> Maybe (ArrayZipper a)
+shiftFocusTo' a zipper = shiftFocusByFind' ((==) a) zipper
 
 -- | Changes the focus element to the first element in the array.
 shiftFocusFirst :: forall a. ArrayZipper a -> ArrayZipper a
