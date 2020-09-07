@@ -49,7 +49,7 @@ import Data.Maybe (Maybe(..), fromMaybe)
 import Data.Traversable (class Traversable, sequenceDefault, traverse)
 import Data.TraversableWithIndex (class TraversableWithIndex, traverseWithIndex)
 import Partial.Unsafe (unsafePartial)
-import Test.QuickCheck.Arbitrary (class Arbitrary, arbitrary)
+import Test.QuickCheck.Arbitrary (class Arbitrary, class Coarbitrary, arbitrary, coarbitrary)
 
 -- | An immutable Zipper for an Array. Modifications are `O(n)` due to creating
 -- | a new array rather than mutating the underlying array. Navigating to a
@@ -309,3 +309,9 @@ instance arbitraryArrayZipper :: Arbitrary a => Arbitrary (ArrayZipper a) where
     let maxIndex = length array - 1
     focusIndex <- chooseInt 0 maxIndex
     pure $ ArrayZipper { array, focusIndex, maxIndex }
+
+instance coarbitraryArrayZipper :: Coarbitrary a => Coarbitrary (ArrayZipper a) where
+  coarbitrary (ArrayZipper r) =
+    coarbitrary r.array >>>
+    coarbitrary r.maxIndex >>>
+    coarbitrary r.focusIndex
