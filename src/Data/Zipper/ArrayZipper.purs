@@ -40,6 +40,7 @@ import Prelude
 
 import Control.Comonad (class Comonad)
 import Control.Extend (class Extend)
+import Control.Monad.Gen (chooseInt)
 import Data.Array (findIndex, length, mapWithIndex, slice, unsafeIndex)
 import Data.Foldable (class Foldable, foldMapDefaultL, foldl, foldr)
 import Data.FoldableWithIndex (class FoldableWithIndex, foldMapWithIndex, foldlWithIndex, foldrWithIndex)
@@ -48,6 +49,7 @@ import Data.Maybe (Maybe(..), fromMaybe)
 import Data.Traversable (class Traversable, sequenceDefault, traverse)
 import Data.TraversableWithIndex (class TraversableWithIndex, traverseWithIndex)
 import Partial.Unsafe (unsafePartial)
+import Test.QuickCheck.Arbitrary (class Arbitrary, arbitrary)
 
 -- | An immutable Zipper for an Array. Modifications are `O(n)` due to creating
 -- | a new array rather than mutating the underlying array. Navigating to a
@@ -299,3 +301,11 @@ pushNextRefocus a (ArrayZipper r) =
                   , maxIndex = r.maxIndex + 1
                   , array = unsafeInsertAt (r.focusIndex + 1) a r.array
                   }
+
+-- Test-related items
+instance arbitraryArrayZipper :: Arbitrary a => Arbitrary (ArrayZipper a) where
+  arbitrary = do
+    array <- arbitrary
+    let maxIndex = length array - 1
+    focusIndex <- chooseInt 0 maxIndex
+    pure $ ArrayZipper { array, focusIndex, maxIndex }
