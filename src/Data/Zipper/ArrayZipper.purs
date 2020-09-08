@@ -41,7 +41,7 @@ import Prelude
 import Control.Comonad (class Comonad)
 import Control.Extend (class Extend)
 import Control.Monad.Gen (chooseInt)
-import Data.Array (findIndex, length, mapWithIndex, slice, unsafeIndex)
+import Data.Array (findIndex, length, mapWithIndex, unsafeIndex)
 import Data.Array.NonEmpty as NEA
 import Data.Foldable (class Foldable, foldMapDefaultL, foldl, foldr)
 import Data.FoldableWithIndex (class FoldableWithIndex, foldMapWithIndex, foldlWithIndex, foldrWithIndex)
@@ -96,15 +96,9 @@ instance traversableWithIndex :: TraversableWithIndex Int ArrayZipper where
 
 instance extendArrayZipper :: Extend ArrayZipper where
   extend :: forall b a. (ArrayZipper a -> b) -> ArrayZipper a -> ArrayZipper b
-  extend f (ArrayZipper recA) =
-    let
-      sliceZipper idx _ =
-        f (ArrayZipper
-            { array: slice idx (recA.maxIndex + 1) recA.array
-            , focusIndex: 0
-            , maxIndex: recA.maxIndex - idx
-            })
-    in ArrayZipper (recA { array = mapWithIndex sliceZipper recA.array})
+  extend f (ArrayZipper rec) =
+    let allFoci idx _ = f (ArrayZipper rec { focusIndex = idx })
+    in ArrayZipper (rec { array = mapWithIndex allFoci rec.array})
 
 instance comonadArrayZipper :: Comonad ArrayZipper where
   extract :: forall a. ArrayZipper a -> a
