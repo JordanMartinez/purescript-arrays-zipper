@@ -103,7 +103,7 @@ instance extendArrayZipper :: Extend ArrayZipper where
             , focusIndex: 0
             , maxIndex: recA.maxIndex - idx
             })
-    in ArrayZipper (recA { focusIndex = 0, array = mapWithIndex sliceZipper recA.array})
+    in ArrayZipper (recA { array = mapWithIndex sliceZipper recA.array})
 
 instance comonadArrayZipper :: Comonad ArrayZipper where
   extract :: forall a. ArrayZipper a -> a
