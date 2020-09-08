@@ -273,7 +273,7 @@ foreign import unsafeInsertAt :: forall a. Int -> a -> Array a -> Array a
 foreign import unsafeSetAt :: forall a. Int -> a -> Array a -> Array a
 foreign import unsafeModifyAt :: forall a. Int -> (a -> a) -> Array a -> Array a
 
--- | Returns the focus element.
+-- | Returns the focus element. `O(1)`
 getFocus :: forall a. ArrayZipper a -> a
 getFocus (ArrayZipper r) = unsafePartial (unsafeIndex r.array r.focusIndex)
 
