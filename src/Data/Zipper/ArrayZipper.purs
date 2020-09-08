@@ -42,6 +42,7 @@ import Control.Comonad (class Comonad)
 import Control.Extend (class Extend)
 import Control.Monad.Gen (chooseInt)
 import Data.Array (findIndex, length, mapWithIndex, slice, unsafeIndex)
+import Data.Array.NonEmpty as NEA
 import Data.Foldable (class Foldable, foldMapDefaultL, foldl, foldr)
 import Data.FoldableWithIndex (class FoldableWithIndex, foldMapWithIndex, foldlWithIndex, foldrWithIndex)
 import Data.FunctorWithIndex (class FunctorWithIndex)
@@ -305,7 +306,7 @@ pushNextRefocus a (ArrayZipper r) =
 -- Test-related items
 instance arbitraryArrayZipper :: Arbitrary a => Arbitrary (ArrayZipper a) where
   arbitrary = do
-    array <- arbitrary
+    array <- NEA.toArray <$> arbitrary
     let maxIndex = length array - 1
     focusIndex <- chooseInt 0 maxIndex
     pure $ ArrayZipper { array, focusIndex, maxIndex }
