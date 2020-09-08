@@ -38,7 +38,11 @@ module Data.Zipper.ArrayZipper
 
 import Prelude
 
+import Control.Comonad (class Comonad)
+import Control.Extend (class Extend)
+import Control.Monad.Gen (chooseInt)
 import Data.Array (findIndex, length, mapWithIndex, unsafeIndex)
+import Data.Array.NonEmpty as NEA
 import Data.Foldable (class Foldable, foldMapDefaultL, foldl, foldr)
 import Data.FoldableWithIndex (class FoldableWithIndex, foldMapWithIndex, foldlWithIndex, foldrWithIndex)
 import Data.FunctorWithIndex (class FunctorWithIndex)
@@ -46,6 +50,7 @@ import Data.Maybe (Maybe(..), fromMaybe)
 import Data.Traversable (class Traversable, sequenceDefault, traverse)
 import Data.TraversableWithIndex (class TraversableWithIndex, traverseWithIndex)
 import Partial.Unsafe (unsafePartial)
+import Test.QuickCheck.Arbitrary (class Arbitrary, class Coarbitrary, arbitrary, coarbitrary)
 
 -- | An immutable Zipper for an Array. Modifications are `O(n)` due to creating
 -- | a new array rather than mutating the underlying array. Navigating to a
@@ -88,6 +93,16 @@ instance traversableWithIndex :: TraversableWithIndex Int ArrayZipper where
   traverseWithIndex f (ArrayZipper r) = ado
     ar <- traverseWithIndex f r.array
     in (ArrayZipper r { array = ar })
+
+instance extendArrayZipper :: Extend ArrayZipper where
+  extend :: forall b a. (ArrayZipper a -> b) -> ArrayZipper a -> ArrayZipper b
+  extend f (ArrayZipper rec) =
+    let allFoci idx _ = f (ArrayZipper rec { focusIndex = idx })
+    in ArrayZipper (rec { array = mapWithIndex allFoci rec.array})
+
+instance comonadArrayZipper :: Comonad ArrayZipper where
+  extract :: forall a. ArrayZipper a -> a
+  extract = getFocus
 
 -- | Creates an Array Zipper from a single element. This will be stored
 -- | internally as a 1-element array. To further build upon this array,
@@ -281,3 +296,17 @@ pushNextRefocus a (ArrayZipper r) =
                   , maxIndex = r.maxIndex + 1
                   , array = unsafeInsertAt (r.focusIndex + 1) a r.array
                   }
+
+-- Test-related items
+instance arbitraryArrayZipper :: Arbitrary a => Arbitrary (ArrayZipper a) where
+  arbitrary = do
+    array <- NEA.toArray <$> arbitrary
+    let maxIndex = length array - 1
+    focusIndex <- chooseInt 0 maxIndex
+    pure $ ArrayZipper { array, focusIndex, maxIndex }
+
+instance coarbitraryArrayZipper :: Coarbitrary a => Coarbitrary (ArrayZipper a) where
+  coarbitrary (ArrayZipper r) =
+    coarbitrary r.array >>>
+    coarbitrary r.maxIndex >>>
+    coarbitrary r.focusIndex

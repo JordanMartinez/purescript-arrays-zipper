@@ -4,9 +4,14 @@ import Prelude
 
 import Data.Maybe (Maybe(..), fromJust)
 import Data.Zipper.ArrayZipper (ArrayZipper, asArrayZipper, getFocus, modifyFocus, next, prev, pushNextRefocus, pushPrevRefocus, setFocus, shiftFocusBy, shiftFocusBy', shiftFocusByFind, shiftFocusByFind', shiftFocusTo, shiftFocusTo', shiftFocusFirst, shiftFocusLast, toArrayZipperAt, toArrayZipperAt', toArrayZipperFirst, toArrayZipperLast)
+import Effect.Class (liftEffect)
 import Partial.Unsafe (unsafePartial)
+import Test.QuickCheck.Laws as Laws
+import Test.QuickCheck.Laws.Control (checkComonad, checkExtend)
+import Test.QuickCheck.Laws.Data (checkEq, checkFoldable, checkFoldableFunctor, checkFunctor, checkFunctorWithIndex, checkOrd)
 import Test.Spec (Spec, describe, it)
 import Test.Spec.Assertions (shouldEqual)
+import Type.Proxy (Proxy(..), Proxy2(..))
 
 spec :: Spec Unit
 spec = describe "Array Zipper" do
@@ -138,6 +143,26 @@ spec = describe "Array Zipper" do
         pushNextRefocus 10 i0 `shouldEqual` mkZipper 1 [0, 10, 1, 2, 3, 4]
         pushNextRefocus 10 i4 `shouldEqual` mkZipper 5 [0, 1, 2, 3, 4, 10]
 
+  describe "Laws" do
+    it "Eq" do
+      liftEffect $ checkEq  proxy1
+    it "Ord" do
+      liftEffect $ checkOrd proxy1
+
+    it "Functor" do
+      liftEffect $ checkFunctor proxy2
+    it "FunctorWithIndex" do
+      liftEffect $ checkFunctorWithIndex proxy2
+    it "Foldable via foldl/foldr" do
+      liftEffect $ checkFoldable proxy2
+    it "Foldable via foldMap" do
+      liftEffect $ checkFoldableFunctor proxy2
+
+    it "Extend" do
+      liftEffect $ checkExtend proxy2
+    it "Comonad" do
+      liftEffect $ checkComonad proxy2
+
   where
     emptyArray :: Array Int
     emptyArray = []
@@ -156,3 +181,7 @@ spec = describe "Array Zipper" do
 
     i4 :: ArrayZipper Int
     i4 = unsafePartial $ fromJust $ toArrayZipperAt 4 a4
+
+    proxy1 = Proxy :: Proxy (ArrayZipper Laws.A)
+
+    proxy2 = Proxy2 :: Proxy2 ArrayZipper
