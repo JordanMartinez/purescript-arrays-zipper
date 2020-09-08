@@ -110,12 +110,16 @@ instance traversableWithIndexArrayZipper :: TraversableWithIndex Int ArrayZipper
     ar <- traverseWithIndex f r.array
     in (ArrayZipper r { array = ar })
 
+-- | Given a function, `f`, passes in `n`-many versions of this zipper to that
+-- | function where `n` corresponds to the number of elements within the array
+-- | and each version of the zipper will focus the element at the `n`th index.
 instance extendArrayZipper :: Extend ArrayZipper where
   extend :: forall b a. (ArrayZipper a -> b) -> ArrayZipper a -> ArrayZipper b
   extend f (ArrayZipper rec) =
     let allFoci idx _ = f (ArrayZipper rec { focusIndex = idx })
     in ArrayZipper (rec { array = mapWithIndex allFoci rec.array})
 
+-- | Gets the focused element (i.e. same as `getFocus`).
 instance comonadArrayZipper :: Comonad ArrayZipper where
   extract :: forall a. ArrayZipper a -> a
   extract = getFocus
