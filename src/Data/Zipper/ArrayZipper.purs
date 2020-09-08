@@ -52,10 +52,26 @@ import Data.TraversableWithIndex (class TraversableWithIndex, traverseWithIndex)
 import Partial.Unsafe (unsafePartial)
 import Test.QuickCheck.Arbitrary (class Arbitrary, class Coarbitrary, arbitrary, coarbitrary)
 
--- | An immutable Zipper for an Array. Modifications are `O(n)` due to creating
--- | a new array rather than mutating the underlying array. Navigating to a
--- | new focus element is `O(1)` regardless of how far away from the current
--- | focus that element is.
+-- | An immutable Zipper for an Array.
+-- |
+-- | This Zipper works well in read-heavy code
+-- | but might not work well in write-heavy code
+-- |
+-- | Modifications to the focused element are `O(n)` due to creating
+-- | a new immutable array with the change rather than mutating the
+-- | underlying array.
+-- |
+-- | Navigating to a new focus element is `O(1)` regardless of how far
+-- | away from the current focus that element is. This
+-- | is in contrast to a `List`-based zipper where modifications
+-- | are `O(1)` and navigation is `O(n)`.
+-- |
+-- | ```
+-- | [0, 1, 2, 3, 4, 5] <-- underlying array
+-- |          ^      ^
+-- |          |      -- maxIndex
+-- |          -- focusIndex
+-- | ```
 newtype ArrayZipper a = ArrayZipper { array :: Array a, focusIndex :: Int, maxIndex :: Int }
 
 derive instance eqArrayZipper :: Eq a => Eq (ArrayZipper a)
