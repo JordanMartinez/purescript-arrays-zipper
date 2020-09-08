@@ -124,6 +124,20 @@ instance comonadArrayZipper :: Comonad ArrayZipper where
   extract :: forall a. ArrayZipper a -> a
   extract = getFocus
 
+-- Test-related items
+instance arbitraryArrayZipper :: Arbitrary a => Arbitrary (ArrayZipper a) where
+  arbitrary = do
+    array <- NEA.toArray <$> arbitrary
+    let maxIndex = length array - 1
+    focusIndex <- chooseInt 0 maxIndex
+    pure $ ArrayZipper { array, focusIndex, maxIndex }
+
+instance coarbitraryArrayZipper :: Coarbitrary a => Coarbitrary (ArrayZipper a) where
+  coarbitrary (ArrayZipper r) =
+    coarbitrary r.array >>>
+    coarbitrary r.maxIndex >>>
+    coarbitrary r.focusIndex
+
 -- | Creates an Array Zipper from a single element. This will be stored
 -- | internally as a 1-element array. To further build upon this array,
 -- | see `push*` functions.
@@ -316,17 +330,3 @@ pushNextRefocus a (ArrayZipper r) =
                   , maxIndex = r.maxIndex + 1
                   , array = unsafeInsertAt (r.focusIndex + 1) a r.array
                   }
-
--- Test-related items
-instance arbitraryArrayZipper :: Arbitrary a => Arbitrary (ArrayZipper a) where
-  arbitrary = do
-    array <- NEA.toArray <$> arbitrary
-    let maxIndex = length array - 1
-    focusIndex <- chooseInt 0 maxIndex
-    pure $ ArrayZipper { array, focusIndex, maxIndex }
-
-instance coarbitraryArrayZipper :: Coarbitrary a => Coarbitrary (ArrayZipper a) where
-  coarbitrary (ArrayZipper r) =
-    coarbitrary r.array >>>
-    coarbitrary r.maxIndex >>>
-    coarbitrary r.focusIndex
