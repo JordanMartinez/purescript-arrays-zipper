@@ -81,7 +81,7 @@ derive instance functorArrayZipper :: Functor ArrayZipper
 instance showArrayZipper :: Show a => Show (ArrayZipper a) where
   show (ArrayZipper r) = "ArrayZipper(" <> show r <> ")"
 
-instance functorWithIndex :: FunctorWithIndex Int ArrayZipper where
+instance functorWithIndexArrayZipper :: FunctorWithIndex Int ArrayZipper where
   mapWithIndex f (ArrayZipper r) = ArrayZipper r { array = mapWithIndex f r.array }
 
 instance foldableArrayZipper :: Foldable ArrayZipper where
@@ -91,7 +91,7 @@ instance foldableArrayZipper :: Foldable ArrayZipper where
 
   foldMap = foldMapDefaultL
 
-instance foldableWithIndex :: FoldableWithIndex Int ArrayZipper where
+instance foldableWithIndexArrayZipper :: FoldableWithIndex Int ArrayZipper where
   foldlWithIndex f init (ArrayZipper r) = foldlWithIndex f init r.array
 
   foldrWithIndex f last (ArrayZipper r) = foldrWithIndex f last r.array
@@ -105,7 +105,7 @@ instance traversableArrayZipper :: Traversable ArrayZipper where
 
   sequence = sequenceDefault
 
-instance traversableWithIndex :: TraversableWithIndex Int ArrayZipper where
+instance traversableWithIndexArrayZipper :: TraversableWithIndex Int ArrayZipper where
   traverseWithIndex f (ArrayZipper r) = ado
     ar <- traverseWithIndex f r.array
     in (ArrayZipper r { array = ar })
