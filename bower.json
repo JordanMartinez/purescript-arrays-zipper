@@ -16,6 +16,11 @@
     "dependencies": {
         "purescript-arrays": "^v5.3.1",
         "purescript-psci-support": "^v4.0.0",
-        "purescript-spec": "^v4.0.1"
+        "purescript-control": "v4.2.0",
+        "purescript-quickcheck": "v6.1.0"
+    },
+    "devDependencies": {
+      "purescript-spec": "^v4.0.1",
+      "purescript-quickcheck-laws": "v5.1.0"
     }
 }

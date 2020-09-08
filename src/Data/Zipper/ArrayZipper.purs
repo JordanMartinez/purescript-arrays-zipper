@@ -52,10 +52,26 @@ import Data.TraversableWithIndex (class TraversableWithIndex, traverseWithIndex)
 import Partial.Unsafe (unsafePartial)
 import Test.QuickCheck.Arbitrary (class Arbitrary, class Coarbitrary, arbitrary, coarbitrary)
 
--- | An immutable Zipper for an Array. Modifications are `O(n)` due to creating
--- | a new array rather than mutating the underlying array. Navigating to a
--- | new focus element is `O(1)` regardless of how far away from the current
--- | focus that element is.
+-- | An immutable Zipper for an Array.
+-- |
+-- | This Zipper works well in read-heavy code
+-- | but might not work well in write-heavy code
+-- |
+-- | Modifications to the focused element are `O(n)` due to creating
+-- | a new immutable array with the change rather than mutating the
+-- | underlying array.
+-- |
+-- | Navigating to a new focus element is `O(1)` regardless of how far
+-- | away from the current focus that element is. This
+-- | is in contrast to a `List`-based zipper where modifications
+-- | are `O(1)` and navigation is `O(n)`.
+-- |
+-- | ```
+-- | [0, 1, 2, 3, 4, 5] <-- underlying array
+-- |          ^      ^
+-- |          |      -- maxIndex
+-- |          -- focusIndex
+-- | ```
 newtype ArrayZipper a = ArrayZipper { array :: Array a, focusIndex :: Int, maxIndex :: Int }
 
 derive instance eqArrayZipper :: Eq a => Eq (ArrayZipper a)
@@ -65,7 +81,7 @@ derive instance functorArrayZipper :: Functor ArrayZipper
 instance showArrayZipper :: Show a => Show (ArrayZipper a) where
   show (ArrayZipper r) = "ArrayZipper(" <> show r <> ")"
 
-instance functorWithIndex :: FunctorWithIndex Int ArrayZipper where
+instance functorWithIndexArrayZipper :: FunctorWithIndex Int ArrayZipper where
   mapWithIndex f (ArrayZipper r) = ArrayZipper r { array = mapWithIndex f r.array }
 
 instance foldableArrayZipper :: Foldable ArrayZipper where
@@ -75,7 +91,7 @@ instance foldableArrayZipper :: Foldable ArrayZipper where
 
   foldMap = foldMapDefaultL
 
-instance foldableWithIndex :: FoldableWithIndex Int ArrayZipper where
+instance foldableWithIndexArrayZipper :: FoldableWithIndex Int ArrayZipper where
   foldlWithIndex f init (ArrayZipper r) = foldlWithIndex f init r.array
 
   foldrWithIndex f last (ArrayZipper r) = foldrWithIndex f last r.array
@@ -89,20 +105,38 @@ instance traversableArrayZipper :: Traversable ArrayZipper where
 
   sequence = sequenceDefault
 
-instance traversableWithIndex :: TraversableWithIndex Int ArrayZipper where
+instance traversableWithIndexArrayZipper :: TraversableWithIndex Int ArrayZipper where
   traverseWithIndex f (ArrayZipper r) = ado
     ar <- traverseWithIndex f r.array
     in (ArrayZipper r { array = ar })
 
+-- | Given a function, `f`, passes in `n`-many versions of this zipper to that
+-- | function where `n` corresponds to the number of elements within the array
+-- | and each version of the zipper will focus the element at the `n`th index.
 instance extendArrayZipper :: Extend ArrayZipper where
   extend :: forall b a. (ArrayZipper a -> b) -> ArrayZipper a -> ArrayZipper b
   extend f (ArrayZipper rec) =
     let allFoci idx _ = f (ArrayZipper rec { focusIndex = idx })
     in ArrayZipper (rec { array = mapWithIndex allFoci rec.array})
 
+-- | Gets the focused element (i.e. same as `getFocus`).
 instance comonadArrayZipper :: Comonad ArrayZipper where
   extract :: forall a. ArrayZipper a -> a
   extract = getFocus
+
+-- Test-related items
+instance arbitraryArrayZipper :: Arbitrary a => Arbitrary (ArrayZipper a) where
+  arbitrary = do
+    array <- NEA.toArray <$> arbitrary
+    let maxIndex = length array - 1
+    focusIndex <- chooseInt 0 maxIndex
+    pure $ ArrayZipper { array, focusIndex, maxIndex }
+
+instance coarbitraryArrayZipper :: Coarbitrary a => Coarbitrary (ArrayZipper a) where
+  coarbitrary (ArrayZipper r) =
+    coarbitrary r.array >>>
+    coarbitrary r.maxIndex >>>
+    coarbitrary r.focusIndex
 
 -- | Creates an Array Zipper from a single element. This will be stored
 -- | internally as a 1-element array. To further build upon this array,
@@ -253,7 +287,7 @@ foreign import unsafeInsertAt :: forall a. Int -> a -> Array a -> Array a
 foreign import unsafeSetAt :: forall a. Int -> a -> Array a -> Array a
 foreign import unsafeModifyAt :: forall a. Int -> (a -> a) -> Array a -> Array a
 
--- | Returns the focus element.
+-- | Returns the focus element. `O(1)`
 getFocus :: forall a. ArrayZipper a -> a
 getFocus (ArrayZipper r) = unsafePartial (unsafeIndex r.array r.focusIndex)
 
@@ -296,17 +330,3 @@ pushNextRefocus a (ArrayZipper r) =
                   , maxIndex = r.maxIndex + 1
                   , array = unsafeInsertAt (r.focusIndex + 1) a r.array
                   }
-
--- Test-related items
-instance arbitraryArrayZipper :: Arbitrary a => Arbitrary (ArrayZipper a) where
-  arbitrary = do
-    array <- NEA.toArray <$> arbitrary
-    let maxIndex = length array - 1
-    focusIndex <- chooseInt 0 maxIndex
-    pure $ ArrayZipper { array, focusIndex, maxIndex }
-
-instance coarbitraryArrayZipper :: Coarbitrary a => Coarbitrary (ArrayZipper a) where
-  coarbitrary (ArrayZipper r) =
-    coarbitrary r.array >>>
-    coarbitrary r.maxIndex >>>
-    coarbitrary r.focusIndex

@@ -9,7 +9,7 @@ You can edit this file as you like.
   , "quickcheck"
   , "quickcheck-laws"
   , "spec"
-  , "transformers"
+  , "control"
   ]
 , packages = ./packages.dhall
 , sources = [ "src/**/*.purs", "test/**/*.purs" ]
