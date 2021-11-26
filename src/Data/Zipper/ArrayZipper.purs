@@ -304,20 +304,22 @@ modifyFocus f (ArrayZipper r) = ArrayZipper (r { array = unsafeModifyAt r.focusI
 
 -- | Drops all elements after the focused element
 dropAfter :: forall a. ArrayZipper a -> ArrayZipper a
-dropAfter (ArrayZipper r) = ArrayZipper ( r { array = before
-                                            , maxIndex = length before - 1
-                                            }
-                                        )
+dropAfter (ArrayZipper r) =
+  ArrayZipper ( r { array = before
+                  , maxIndex = length before - 1
+                  }
+              )
   where
     { before } = splitAt (r.focusIndex + 1) r.array
 
 -- | Drops all elements before the focused element
 dropBefore :: forall a. ArrayZipper a -> ArrayZipper a
-dropBefore (ArrayZipper r) = ArrayZipper ( r { array = after
-                                             , focusIndex = 0
-                                             , maxIndex = length after - 1
-                                             }
-                                         )
+dropBefore (ArrayZipper r) =
+  ArrayZipper ( r { array = after
+                  , focusIndex = 0
+                  , maxIndex = length after - 1
+                  }
+              )
   where
     { after } = splitAt r.focusIndex r.array
 
