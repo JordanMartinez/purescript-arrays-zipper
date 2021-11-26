@@ -10,6 +10,13 @@ You can edit this file as you like.
   , "quickcheck-laws"
   , "spec"
   , "control"
+  , "aff"
+  , "effect"
+  , "foldable-traversable"
+  , "gen"
+  , "maybe"
+  , "partial"
+  , "prelude"
   ]
 , packages = ./packages.dhall
 , sources = [ "src/**/*.purs", "test/**/*.purs" ]

@@ -10,6 +10,9 @@ module Data.Zipper.ArrayZipper
   , exposeMaxIndex
   , exposeFocusIndex
 
+  , dropBefore
+  , dropAfter
+
   , hasPrev
   , hasNext
 
@@ -41,7 +44,7 @@ import Prelude
 import Control.Comonad (class Comonad)
 import Control.Extend (class Extend)
 import Control.Monad.Gen (chooseInt)
-import Data.Array (findIndex, length, mapWithIndex, unsafeIndex)
+import Data.Array (findIndex, length, mapWithIndex, unsafeIndex, splitAt)
 import Data.Array.NonEmpty as NEA
 import Data.Foldable (class Foldable, foldMapDefaultL, foldl, foldr)
 import Data.FoldableWithIndex (class FoldableWithIndex, foldMapWithIndex, foldlWithIndex, foldrWithIndex)
@@ -258,7 +261,7 @@ shiftFocusByFind f zipper = fromMaybe zipper $ shiftFocusByFind' f zipper
 -- | If no element matches, `Nothing` is returned.
 -- | If an element matches, `Just zipper` is returned.
 shiftFocusByFind' :: forall a. (a -> Boolean) -> ArrayZipper a -> Maybe (ArrayZipper a)
-shiftFocusByFind' f zipper@(ArrayZipper r) = do
+shiftFocusByFind' f (ArrayZipper r) = do
   index <- findIndex f r.array
   pure $ ArrayZipper $ r { focusIndex = index }
 
@@ -298,6 +301,27 @@ setFocus a (ArrayZipper r) = ArrayZipper (r { array = unsafeSetAt r.focusIndex a
 -- | Uses a function to update the focus element. `O(n)`
 modifyFocus :: forall a. (a -> a) -> ArrayZipper a -> ArrayZipper a
 modifyFocus f (ArrayZipper r) = ArrayZipper (r { array = unsafeModifyAt r.focusIndex f r.array })
+
+-- | Drops all elements after the focused element
+dropAfter :: forall a. ArrayZipper a -> ArrayZipper a
+dropAfter (ArrayZipper r) =
+  ArrayZipper ( r { array = before
+                  , maxIndex = length before - 1
+                  }
+              )
+  where
+    { before } = splitAt (r.focusIndex + 1) r.array
+
+-- | Drops all elements before the focused element
+dropBefore :: forall a. ArrayZipper a -> ArrayZipper a
+dropBefore (ArrayZipper r) =
+  ArrayZipper ( r { array = after
+                  , focusIndex = 0
+                  , maxIndex = length after - 1
+                  }
+              )
+  where
+    { after } = splitAt r.focusIndex r.array
 
 -- | Inserts an element in front of / to the left of the focus element. `O(n)`
 pushPrev :: forall a. a -> ArrayZipper a -> ArrayZipper a

@@ -3,7 +3,7 @@ module Test.Data.Zipper.ArrayZipper where
 import Prelude
 
 import Data.Maybe (Maybe(..), fromJust)
-import Data.Zipper.ArrayZipper (ArrayZipper, asArrayZipper, getFocus, modifyFocus, next, prev, pushNextRefocus, pushPrevRefocus, setFocus, shiftFocusBy, shiftFocusBy', shiftFocusByFind, shiftFocusByFind', shiftFocusTo, shiftFocusTo', shiftFocusFirst, shiftFocusLast, toArrayZipperAt, toArrayZipperAt', toArrayZipperFirst, toArrayZipperLast)
+import Data.Zipper.ArrayZipper (ArrayZipper, asArrayZipper, dropAfter, dropBefore, getFocus, modifyFocus, next, prev, pushNextRefocus, pushPrevRefocus, setFocus, shiftFocusBy, shiftFocusBy', shiftFocusByFind, shiftFocusByFind', shiftFocusFirst, shiftFocusLast, shiftFocusTo, shiftFocusTo', toArrayZipperAt, toArrayZipperAt', toArrayZipperFirst, toArrayZipperLast)
 import Effect.Class (liftEffect)
 import Partial.Unsafe (unsafePartial)
 import Test.QuickCheck.Laws as Laws
@@ -142,6 +142,11 @@ spec = describe "Array Zipper" do
       it "next with refocus" do
         pushNextRefocus 10 i0 `shouldEqual` mkZipper 1 [0, 10, 1, 2, 3, 4]
         pushNextRefocus 10 i4 `shouldEqual` mkZipper 5 [0, 1, 2, 3, 4, 10]
+    describe "dropping" do
+      it "drops before focus" do
+        dropBefore i2 `shouldEqual` mkZipper 0 [2, 3, 4]
+      it "drops after focus" do
+        dropAfter i2 `shouldEqual` mkZipper 2 [0, 1, 2]
 
   describe "Laws" do
     it "Eq" do
