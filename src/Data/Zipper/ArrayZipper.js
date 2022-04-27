@@ -1,6 +1,6 @@
 "use strict";
 
-exports.unsafeInsertAt = function (i) {
+export function unsafeInsertAt(i) {
   return function (a) {
     return function (l) {
       var l1 = l.slice();
@@ -8,9 +8,9 @@ exports.unsafeInsertAt = function (i) {
       return l1;
     };
   };
-};
+}
 
-exports.unsafeSetAt = function (i) {
+export function unsafeSetAt(i) {
   return function (a) {
     return function (l) {
       var l1 = l.slice();
@@ -18,9 +18,9 @@ exports.unsafeSetAt = function (i) {
       return l1;
     };
   };
-};
+}
 
-exports.unsafeModifyAt = function (i) {
+export function unsafeModifyAt(i) {
   return function (f) {
     return function (l) {
       var l1 = l.slice();
@@ -28,4 +28,4 @@ exports.unsafeModifyAt = function (i) {
       return l1;
     };
   };
-};
+}
