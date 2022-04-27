@@ -1,5 +1,3 @@
-"use strict";
-
 export function unsafeInsertAt(i) {
   return function (a) {
     return function (l) {
