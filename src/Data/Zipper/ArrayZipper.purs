@@ -258,7 +258,7 @@ shiftFocusByFind f zipper = fromMaybe zipper $ shiftFocusByFind' f zipper
 -- | If no element matches, `Nothing` is returned.
 -- | If an element matches, `Just zipper` is returned.
 shiftFocusByFind' :: forall a. (a -> Boolean) -> ArrayZipper a -> Maybe (ArrayZipper a)
-shiftFocusByFind' f zipper@(ArrayZipper r) = do
+shiftFocusByFind' f (ArrayZipper r) = do
   index <- findIndex f r.array
   pure $ ArrayZipper $ r { focusIndex = index }
 
