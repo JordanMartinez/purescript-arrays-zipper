@@ -4,12 +4,19 @@ You can edit this file as you like.
 -}
 { name = "my-project"
 , dependencies =
-  [ "arrays"
+  [ "aff"
+  , "arrays"
+  , "control"
+  , "effect"
+  , "foldable-traversable"
+  , "gen"
+  , "maybe"
+  , "partial"
+  , "prelude"
   , "psci-support"
   , "quickcheck"
   , "quickcheck-laws"
   , "spec"
-  , "control"
   ]
 , packages = ./packages.dhall
 , sources = [ "src/**/*.purs", "test/**/*.purs" ]
