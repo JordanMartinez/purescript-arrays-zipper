@@ -11,7 +11,7 @@ import Test.QuickCheck.Laws.Control (checkComonad, checkExtend)
 import Test.QuickCheck.Laws.Data (checkEq, checkFoldable, checkFoldableFunctor, checkFunctor, checkFunctorWithIndex, checkOrd)
 import Test.Spec (Spec, describe, it)
 import Test.Spec.Assertions (shouldEqual)
-import Type.Proxy (Proxy(..), Proxy2(..))
+import Type.Proxy (Proxy(..))
 
 spec :: Spec Unit
 spec = describe "Array Zipper" do
@@ -184,4 +184,4 @@ spec = describe "Array Zipper" do
 
     proxy1 = Proxy :: Proxy (ArrayZipper Laws.A)
 
-    proxy2 = Proxy2 :: Proxy2 ArrayZipper
+    proxy2 = Proxy :: Proxy ArrayZipper
