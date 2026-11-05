@@ -1,0 +1,26 @@
+package:
+  name: arrays-zipper
+  publish:
+    version: 2.0.2
+    license: MIT
+    location:
+      githubOwner: JordanMartinez
+      githubRepo: purescript-arrays-zipper
+  dependencies:
+    - arrays: ">=7.0.0 <8.0.0"
+    - control: ">=6.0.0 <7.0.0"
+    - foldable-traversable: ">=6.0.0 <7.0.0"
+    - gen: ">=4.0.0 <5.0.0"
+    - maybe: ">=6.0.0 <7.0.0"
+    - partial: ">=4.0.0 <5.0.0"
+    - prelude: ">=6.0.0 <7.0.0"
+    - quickcheck: ">=8.0.1 <9.0.0"
+  test:
+    main: Test.Main
+    dependencies:
+      - aff: ">=7.0.0 <8.0.0"
+      - effect: ">=4.0.0 <5.0.0"
+      - psci-support: ">=6.0.0 <7.0.0"
+      - quickcheck-laws: ">=7.0.0 <8.0.0"
+      - spec: ">=7.0.0 <8.0.0"
+workspace: {}
